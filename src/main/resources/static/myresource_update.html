@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料</title>
+    <link rel="stylesheet" href="css/conmmon.css">
+    <link rel="stylesheet" href="css/myresource.css">
+    <!-- 引入 jQuery -->
+    <script src="js/jquery.min.js"></script>
+    <!-- 引入工具js -->
+    <script src="js/tools.js"></script>
+
+    <script src="js/cityAndPro.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+</head>
+
+<body>
+<!-- 导航栏 -->
+<div class="nav">
+    <img src="img/logo2.jpg" alt="">
+    <span class="title">我的博客系统</span>
+    <!-- 用来占据中间位置 -->
+    <span class="spacer"></span>
+    <a href="myresource.html">个人资料</a>
+    <a href="myblog_list.html">我的主页</a>
+    <a href="blog_list.html">博客主页</a>
+    <a href="mydrafts_list.html">我的草稿</a>
+    <a href="blog_edit.html">写博客</a>
+    <a href="javascript:onExit()">退出登陆</a>
+    <!-- <a href="#">注销</a> -->
+</div>
+<!-- 版心 -->
+<div class="container">
+    <!-- 左侧个人信息 -->
+    <div class="container-left">
+        <div class="card">
+            <!--            <img src="img/doge.jpg" class="avtar" alt="">-->
+            <img src="img/doge.jpg" class="avtar" id="avtar" alt="">
+            <h3 id="username">狗</h3>
+            <a href="http:www.github.com">github 地址</a>
+            <div class="counter">
+                <span>文章</span>
+                <span>分类</span>
+            </div>
+            <div class="counter">
+                <span>2</span>
+                <span>1</span>
+            </div>
+        </div>
+    </div>
+    <!-- 右侧内容详情 -->
+    <div class="container-right">
+        <div class="blog">
+            <li>
+                <span>用</span>
+                &nbsp;
+                <span>户</span>
+                &nbsp;
+                <span>名：</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="text" class="username" id="name" value="">
+                <!--                <textarea type="text" class="username" id="name" cols=50 rows=1 style="resize:none;"></textarea>-->
+            </li>
+            <li>
+                <span>用</span>
+                &nbsp;
+                <span>户</span>
+                &nbsp;
+                <span>ID：</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="uid" id="uid"></a>
+            </li>
+            <li>
+                <span>性</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>别：</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!--                <textarea type="text" class="briefinfo" id="sex" cols=50 rows=1 style="resize:none;"></textarea>-->
+                <input type="radio" name="sex" id="male" onclick="check(this.value)" value="男">
+                <label for="male">男</label>
+                &nbsp;
+                <input type="radio" name="sex" id="female" onclick="check(this.value)" value="女">
+                <label for="female">女</label>
+                &nbsp;
+                <input type="radio" name="sex" id="none" onclick="check(this.value)" value="" checked>
+                <label for="none">隐藏</label>
+                <!--                不显示-->
+                <input type="text" id="answer" name="CheckResult" hidden/>
+            </li>
+            <li>
+                <a>个 人 简 介：</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <textarea type="text" class="briefinfo" id="briefinfo" cols=50 rows=1 style="resize:none;"></textarea>
+            </li>
+            <li>
+                <a>所 在 地 区：</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!--                <textarea type="text" class="address" id="address" cols=50 rows=1 style="resize:none;"></textarea>-->
+                <select name="input_province" id="input_province">
+                    <option value="">--请选择--</option>
+                </select>
+                <select name="input_city" id="input_city">
+                    <option value="">--请选择--</option>
+                </select>
+            </li>
+            <li>
+                <a>出 生 日 期：</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!--                <textarea type="text" class="birthday" id="birthday" cols=50 rows=1 style="resize:none;"></textarea>-->
+                <input type="date" class="form-control" placeholder="请输入出生年月"
+                       name="birthday" id="birthday" value="" max="2023-01-20">
+            </li>
+            <li>
+                <a>CSDN 地址：</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <textarea type="text" class="csdnsite" id="csdnsite" cols=50 rows=1 style="resize:none;"></textarea>
+            </li>
+            <li>
+                <a>GitHub地址：</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <textarea type="text" class="githubsite" id="githubsite" cols=50 rows=1 style="resize:none;"></textarea>
+            </li>
+            <a href="javascript:update()" class="detail">保存个人信息</a>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+    var uid;
+    var name;
+    var sex;
+    var briefinfo;
+    var address;
+    var birthday;
+    var csdnsite;
+    var githubsite;
+
+    // 地址
+    var myprovince;
+    var mycity;
+
+    var avtar;
+
+    // 获取个人简介
+    function myintroduce() {
+        jQuery.ajax({
+            url: "/myintro/findintro",
+            type: "POST",
+            data: {},
+            success: function (result) {
+                if (result.code == 200 && result.data != null) {
+                    if (result.data.csdnsite != null) {
+                        csdnsite = result.data.csdnsite;
+                    }
+                    if (result.data.githubsite != null) {
+                        githubsite = result.data.githubsite;
+                    }
+
+                    // 控制性别
+                    // jQuery("#sex").text(result.data.sex);
+                    // document.getElementById("answer").value = sex;
+                    // document.getElementById("answer").setAttribute('value', sex);
+                    if (result.data.sex == "男") {
+                        $("input:radio[value='男']").attr('checked', 'true');
+                    }
+                    if (result.data.sex == "女") {
+                        $("input:radio[value='女']").attr('checked', 'true');
+                    }
+                    sex = result.data.sex;
+
+                    jQuery("#briefinfo").text(result.data.briefinfo);
+
+                    myprovince = result.data.address.split('/')[0];
+                    mycity = result.data.address.split('/')[1];
+                    $("#input_province").val(result.data.address.split('/')[0]);
+                    findcity()
+                    $("#input_city").val(result.data.address.split('/')[1]);
+
+                    // 控制出生日期
+                    // if (result.data.birthday == null) {
+                    //     jQuery("#birthday").text('输入样例：2023-1-25（年-月-日）/20230125（8位年月日）');
+                    // } else {
+                    //     jQuery("#birthday").data(result.data.birthday);
+                    // }
+                    $("#birthday").attr("value", result.data.birthday);
+
+                    jQuery("#csdnsite").text(result.data.csdnsite);
+                    jQuery("#githubsite").text(result.data.githubsite);
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+
+    // 获取个人信息
+    function myinfo() {
+        jQuery.ajax({
+            url: "/user/myinfo",
+            type: "POST",
+            data: {},
+            success: function (result) {
+                if (result.code == 200 && result.data != null) {
+                    uid = result.data.id;
+                    myInfoById(uid);
+                    myintroduce();
+                }
+            },
+            error: function (err) {
+                if (err != null && err.status == 401) {
+                    alert("用户未登录，即将跳转到登录页")
+                    // 已经被拦截器拦截了，未登录
+                    location.href = "/login.html";
+                }
+            }
+        });
+    }
+
+    // 获取个人信息
+    function myInfoById(uid) {
+        // 后端添加 /user/myinfobyuid 通过用户 id 查询用户对象
+        jQuery.ajax({
+            url: "/user/myinfobyuid",
+            type: "POST",
+            data: {"uid": uid},
+            success: function (result) {
+                if (result.code == 200 && result.data != null) {
+                    if (result.data.photo != null && result.data.photo != "") {
+                        avtar = "http://localhost:8080/img/" + result.data.photo;
+                        $("#avtar").attr("src", avtar);
+                    }
+                    jQuery("#username").text(result.data.username);
+                    // jQuery("#name").text(result.data.username);
+                    document.getElementById("name").value = result.data.username;
+                    jQuery("#uid").text(result.data.id);
+                }
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+
+    myinfo();
+
+    // 修改个人信息
+    function update() {
+        // var name = jQuery("#name");
+        name = document.getElementById("name").value;
+        if (name == "") {
+            alert("请先输入用户名！");
+            name.focus();
+            return false;
+        }
+        // var sex = jQuery("#sex");
+        // sex = document.getElementById("answer").value;
+        briefinfo = jQuery("#briefinfo");
+
+        // 所在地区
+        myprovince = jQuery("#input_province");
+        mycity = jQuery("#input_city");
+        if (myprovince.val() != "" && mycity.val() == "") {
+            alert("请先选择城市！");
+            return false;
+        }
+        if (myprovince.val() == "" && mycity.val() != "") {
+            alert("请先选择省份！");
+            return false;
+        }
+        address = myprovince.val() + "/" + mycity.val();
+
+        birthday = jQuery("#birthday");
+        csdnsite = jQuery("#csdnsite");
+        githubsite = jQuery("#githubsite");
+
+        jQuery.ajax({
+            url: "/myintro/update",
+            type: "POST",
+            data: {
+                // "username": name.val(),
+                "username": name,
+                // "sex": sex.val(),
+                "sex": sex,
+                "briefinfo": briefinfo.val(),
+                "address": address,
+                "birthday": birthday.val(),
+                "csdnsite": csdnsite.val(),
+                "githubsite": githubsite.val()
+            },
+            success: function (result) {
+                if (result.code == 200 && result.data != null) {
+                    alert("恭喜，保存成功！");
+                    location.href = "myresource.html";
+                } else {
+                    alert("抱歉：保存失败，请重试！");
+                }
+            },
+            error: function (err) {
+                if (err != null && err.status == 401) {
+                    alert("用户未登录，即将跳转到登录页")
+                    // 已经被拦截器拦截了，未登录
+                    location.href = "/login.html";
+                }
+            }
+        });
+    }
+
+    // 退出登录
+    function onExit() {
+        if (confirm("修改的个人信息未保存，确认退出？")) {
+            // Ajax 请求后端进行退出操作
+            jQuery.ajax({
+                url: "/user/logout",
+                type: "POST",
+                data: {},
+                success: function (result) {
+                    location.href = "/login.html";
+                },
+                error: function (err) {
+                    if (err != null && err.status == 401) {
+                        alert("用户未登录，即将跳转到登录页")
+                        // 已经被拦截器拦截了，未登录
+                        location.href = "/login.html";
+                    }
+                }
+            });
+        }
+    }
+
+    // 性别选择
+    function check(radio) {
+        document.getElementById("answer").value = radio;
+        sex = radio;
+    }
+
+    // 选择城市
+    function findcity() {
+        var province_idx;
+        var cityList = [];
+        if (myprovince == "") return;
+        $("#input_city option").remove();
+        var html = "<option value=''>--请选择--</option>";
+
+//					获取已选择的省份的数组下标
+        $.each(cityMessage, function (idx, item) {
+            if (myprovince == item.regname && item.parid == '1') {
+                province_idx = idx
+            }
+        })
+
+//					获取已选择的省份的城市列表
+        $.each(cityMessage, function (idx, item) {
+            if (cityMessage[idx].parid == cityMessage[province_idx].regid) {
+                cityList.push(cityMessage[idx])
+            }
+        })
+
+//					添加城市信息给标签
+        if (cityList instanceof Array && cityList.length > 0) {
+            $.each(cityList, function (idx, item) {
+                console.log(item)
+                html += "<option value='" + item.regname + "' exid='" + item.regid + "'>" + item.regname + "</option>";
+            });
+        } else {
+            html += "<option value='" + cityMessage[province_idx].regname + "' exid='" + cityMessage[province_idx].regid + "'>" + cityMessage[province_idx].regname + "</option>";
+        }
+        $("#input_city").append(html);
+    }
+
+    // 设置城市
+    $(function () {
+        var html = "";
+        var province_idx;
+        $("#input_city").append(html);
+
+        $.each(cityMessage, function (idx, item) {
+            if (item.parid == '1') {
+                html += "<option value='" + item.regname + "' exid='" + item.regid + "'>" + item.regname + "</option>";
+            }
+
+        });
+        $("#input_province").append(html);
+        $("#input_province").change(function (e) {
+            var province = $(this).val();
+            var cityList = [];
+            if (province == "") return;
+            $("#input_city option").remove();
+            var html = "<option value=''>--请选择--</option>";
+
+//					获取已选择的省份的数组下标
+            $.each(cityMessage, function (idx, item) {
+                if (province == item.regname && item.parid == '1') {
+                    province_idx = idx
+                }
+            })
+
+//					获取已选择的省份的城市列表
+            $.each(cityMessage, function (idx, item) {
+                if (cityMessage[idx].parid == cityMessage[province_idx].regid) {
+                    cityList.push(cityMessage[idx])
+                }
+            })
+
+//					添加城市信息给标签
+            if (cityList instanceof Array && cityList.length > 0) {
+                $.each(cityList, function (idx, item) {
+                    console.log(item)
+                    html += "<option value='" + item.regname + "' exid='" + item.regid + "'>" + item.regname + "</option>";
+                });
+            } else {
+                html += "<option value='" + cityMessage[province_idx].regname + "' exid='" + cityMessage[province_idx].regid + "'>" + cityMessage[province_idx].regname + "</option>";
+            }
+            $("#input_city").append(html);
+        });
+    });
+
+    // 设置生日不得超过当前数日期
+    $(function () {
+        //得到当前时间
+        var date_now = new Date();
+        //得到当前年份
+        var year = date_now.getFullYear();
+        //得到当前月份
+        //注：
+        //  1：js中获取Date中的month时，会比当前月份少一个月，所以这里需要先加一
+        //  2: 判断当前月份是否小于10，如果小于，那么就在月份的前面加一个 '0' ， 如果大于，就显示当前月份
+        var month = date_now.getMonth() + 1 < 10 ? "0" + (date_now.getMonth() + 1) : (date_now.getMonth() + 1);
+        //得到当前日子（多少号）
+        var date = date_now.getDate() < 10 ? "0" + date_now.getDate() : date_now.getDate();
+        //设置input标签的max属性
+        $("#birthday").attr("max", year + "-" + month + "-" + date);
+    })
+</script>
+</html>

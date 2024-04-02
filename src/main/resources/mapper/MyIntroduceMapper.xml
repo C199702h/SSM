@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mycnblog.mapper.MyIntroduceMapper">
+    <select id="myIntroByUid" resultType="com.example.mycnblog.model.MyIntroduceInfo">
+        select *
+        from myintroduce
+        where uid = #{uid}
+    </select>
+
+    <insert id="add">
+        insert into myintroduce
+        <trim prefix="(" suffix=")" prefixOverrides="," suffixOverrides=",">
+            <if test="sex!=null">
+                sex,
+            </if>
+            briefinfo,
+            <if test="address!=null">
+                address,
+            </if>
+            <if test="birthday!=null">
+                birthday,
+            </if>
+            <if test="csdnsite!=null">
+                csdnsite,
+            </if>
+            <if test="githubsite!=null">
+                githubsite,
+            </if>
+            uid,
+        </trim>
+        values
+        <trim prefix="(" suffix=")" prefixOverrides="," suffixOverrides=",">
+            <if test="sex!=null">
+                #{sex},
+            </if>
+            <if test="briefinfo!=null">
+                #{briefinfo},
+            </if>
+            <if test="briefinfo==null">
+                '作者很懒，什么简介都没有~',
+            </if>
+            <if test="address!=null">
+                #{address},
+            </if>
+            <if test="birthday!=null">
+                #{birthday},
+            </if>
+            <if test="csdnsite!=null">
+                #{csdnsite},
+            </if>
+            <if test="githubsite!=null">
+                #{githubsite},
+            </if>
+            #{uid},
+        </trim>
+    </insert>
+
+    <update id="update">
+        update myintroduce
+        set sex=#{sex},
+        <if test="briefinfo!=null">
+            briefinfo=#{briefinfo},
+        </if>
+        <if test="briefinfo==null">
+            briefinfo='作者很懒，什么简介都没有~',
+        </if>
+        address=#{address},
+        birthday=#{birthday},
+        csdnsite=#{csdnsite},
+        githubsite=#{githubsite}
+        where uid = #{uid}
+    </update>
+</mapper>
